@@ -14,6 +14,7 @@ html, body, * {
 
 body {
   background-color: $background-color;
+  position: relative;
 }
 
 h1, p {
@@ -50,6 +51,21 @@ main {
     &#incompatible {
       padding-bottom: 5em;
     }
+  }
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+
+  font-size: 0.8em;
+  text-align: left;
+
+  &, a {
+    color: #DDDDDD;
   }
 }
 
@@ -111,7 +127,7 @@ section.buttons {
 
   @media screen and (max-width: 600px) {
     flex-direction: column;
-    padding-bottom: 4vh;
+    padding-bottom: calc(4vh + 4em);
 
     button {
       margin: 4vh 2vw 0vh 2vw;
