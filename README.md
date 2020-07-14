@@ -22,4 +22,5 @@ This application is released under [GPL version 3.0](LICENSE).
 
 The favicon was made by Scott Zeid and
 [released](https://commons.wikimedia.org/wiki/File:Calculator-ti-84-plus-silver-edition.svg#Licensing)
-under a Creative Commons Attribution 3.0 Unported license.
+under a Creative Commons [Attribution 3.0 Unported](https://creativecommons.org/licenses/by/3.0/deed.en)
+license. No changes were made other than transforming the image into an icon file.
