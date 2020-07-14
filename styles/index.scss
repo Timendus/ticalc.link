@@ -25,7 +25,8 @@ h1, p {
 
 h1 {
   font-size: 3em;
-  margin: 1em 0 0.2em 0;
+  margin: 0 0 0.2em 0;
+  font-variant: small-caps;
 }
 
 main {
@@ -38,7 +39,7 @@ main {
     display: none;
     background-color: rgba(255, 255, 255, 0.2);
     width: 100vw;
-    padding: 1em;
+    padding: 4em;
 
     -webkit-box-shadow: $shadow;
     -moz-box-shadow: $shadow;
@@ -50,6 +51,10 @@ main {
 
     &#incompatible {
       padding-bottom: 5em;
+    }
+
+    @media screen and (max-width: 600px) {
+      padding-bottom: 8em;
     }
   }
 }
@@ -127,10 +132,10 @@ section.buttons {
 
   @media screen and (max-width: 600px) {
     flex-direction: column;
-    padding-bottom: calc(4vh + 4em);
+    margin: 2vh;
 
     button {
-      margin: 4vh 2vw 0vh 2vw;
+      margin: 2vh 2vw 2vh 2vw;
     }
   }
 
