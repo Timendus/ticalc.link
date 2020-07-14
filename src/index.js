@@ -35,16 +35,22 @@ function updateButtons() {
 
   if ( calculator )
     document.querySelector('#connect').classList.add('complete');
-  else
+  else {
     document.querySelector('#connect').classList.add('active');
+    document.querySelector('#connect').focus();
+  }
 
   if ( file )
     document.querySelector('#upload').classList.add('complete');
-  else if ( calculator )
+  else if ( calculator ) {
     document.querySelector('#upload').classList.add('active');
+    document.querySelector('#upload').focus();
+  }
 
-  if ( calculator && file )
+  if ( calculator && file ) {
     document.querySelector('#start').classList.add('active');
+    document.querySelector('#start').focus();
+  }
 }
 
 function attachConnectionListeners() {
@@ -58,11 +64,9 @@ function attachConnectionListeners() {
   });
 
   ticalc.addEventListener('connect', async calc => {
-    calculator = calc;
-
-    if ( await calculator.isReady() ) {
+    if ( await calc.isReady() ) {
+      calculator = calc;
       updateButtons();
-      console.log(await calculator.getFreeMem());
     }
   });
 }
@@ -103,9 +107,19 @@ function readFile(file) {
   });
 }
 
-function sendFile() {
+async function sendFile() {
   if ( !calculator || !file ) return;
   if ( !tifiles.isMatch(file, calculator) )
     return alert(`The file you have selected does not appear to be a valid file for your ${calculator.name}`);
-  calculator.sendFile(file);
+  if ( (await calculator.getFreeMem()).ram < file.size )
+    return alert('Your calculator does not have enough free memory to receive this file');
+
+  try {
+    await calculator.sendFile(file);
+    document.querySelector('#start').classList.remove('active');
+    document.querySelector('#start').classList.add('complete');
+    setTimeout(() => alert('The file has been sent!'), 100);
+  } catch(e) {
+    alert('Sorry, something went wrong 😢');
+  }
 }
