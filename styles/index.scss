@@ -1,0 +1,109 @@
+$background-color: #052b5a;
+$text-color: #d4d4d4;
+$button-color: #1b1a31;
+$active-button-color: #ce093f;
+$complete-button-color: #236946;
+$shadow: 0px 0px 33px -10px rgba(0,0,0,0.75);
+$font: Roboto, Tahoma, Arial, sans-serif;
+
+html, body, * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: $background-color;
+}
+
+h1, p {
+  text-align: center;
+  color: $text-color;
+  font-family: $font;
+}
+
+h1 {
+  font-size: 3em;
+  margin: 1em 0 0.2em 0;
+}
+
+main {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > section {
+    display: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 100vw;
+    padding: 1em;
+
+    -webkit-box-shadow: $shadow;
+    -moz-box-shadow: $shadow;
+    box-shadow: $shadow;
+
+    &.active {
+      display: block;
+    }
+
+    &#incompatible {
+      padding-bottom: 5em;
+    }
+  }
+}
+
+section.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    width: 20vw;
+    max-width: 200px;
+    height: 20vw;
+    max-height: 200px;
+    margin: 5vh 2vw 5vh 2vw;
+
+    border-radius: 50%;
+    background-color: $button-color;
+    border: 0px;
+    cursor: default;
+
+    -webkit-box-shadow: $shadow;
+    -moz-box-shadow: $shadow;
+    box-shadow: $shadow;
+
+    color: $text-color;
+    font-family: $font;
+
+    &.active {
+      background-color: $active-button-color;
+      cursor: pointer;
+
+      &:focus, &:hover {
+        border: 10px solid darken($active-button-color, 5%);
+      }
+    }
+
+    &.complete {
+      background-color: $complete-button-color;
+      cursor: pointer;
+
+      &:focus, &:hover {
+        border: 10px solid darken($complete-button-color, 5%);
+      }
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    span {
+      font-size: 3em;
+      display: block;
+      margin: 0 0 0.2em 0;
+    }
+  }
+}
