@@ -1,7 +1,7 @@
 $background-color: #052b5a;
 $text-color: #d4d4d4;
 $button-color: #1b1a31;
-$active-button-color: #ce093f;
+$active-button-color: #a7610c;
 $complete-button-color: #236946;
 $shadow: 0px 0px 33px -10px rgba(0,0,0,0.75);
 $font: Roboto, Tahoma, Arial, sans-serif;
@@ -28,7 +28,7 @@ h1 {
 }
 
 main {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,8 +62,10 @@ section.buttons {
   button {
     width: 20vw;
     max-width: 200px;
+    min-width: 140px;
     height: 20vw;
     max-height: 200px;
+    min-height: 140px;
     margin: 5vh 2vw 5vh 2vw;
 
     border-radius: 50%;
@@ -106,4 +108,14 @@ section.buttons {
       margin: 0 0 0.2em 0;
     }
   }
+
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+    padding-bottom: 4vh;
+
+    button {
+      margin: 4vh 2vw 0vh 2vw;
+    }
+  }
+
 }
