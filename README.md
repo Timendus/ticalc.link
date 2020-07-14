@@ -15,3 +15,11 @@ it. So be warned.
 If you run into issues, please
 [report them](https://github.com/Timendus/ticalc-usb/issues/new) or submit a PR
 at the [`ticalc-usb` library](https://github.com/Timendus/ticalc-usb).
+
+## License
+
+This application is released under [GPL version 3.0](LICENSE).
+
+The favicon was made by Scott Zeid and
+[released](https://commons.wikimedia.org/wiki/File:Calculator-ti-84-plus-silver-edition.svg#Licensing)
+under a Creative Commons Attribution 3.0 Unported license.
