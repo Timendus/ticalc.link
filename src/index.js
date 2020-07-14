@@ -122,5 +122,6 @@ async function sendFile() {
     setTimeout(() => alert('The file has been sent!'), 100);
   } catch(e) {
     alert('Sorry, something went wrong 😢');
+    console.error(e);
   }
 }
