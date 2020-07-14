@@ -1,5 +1,4 @@
 const { ticalc, tifiles } = require('ticalc-usb');
-console.log(require('ticalc-usb'));
 
 let calculator = null;
 let file = null;
