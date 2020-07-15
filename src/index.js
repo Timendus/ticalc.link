@@ -110,7 +110,7 @@ function readFile(file) {
 
 async function sendFile() {
   if ( !calculator || !file ) return;
-  if ( !tifiles.isMatch(file, calculator) )
+  if ( !calculator.canReceive(file) )
     return alert(`The file you have selected does not appear to be a valid file for your ${calculator.name}`);
   if ( (await calculator.getFreeMem()).ram < file.size )
     return alert('Your calculator does not have enough free memory to receive this file');
