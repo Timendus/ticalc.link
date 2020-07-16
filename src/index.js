@@ -4,25 +4,20 @@ let calculator = null;
 let file = null;
 
 window.addEventListener('load', () => {
-  if ( usbSupported() ) {
+  if ( ticalc.browserSupported() ) {
     showSupportedDevices();
     attachConnectionListeners();
     updateButtons();
     attachClickListeners();
-  }
-});
+    ticalc.init();
 
-function usbSupported() {
-  if ( navigator.usb ) {
     document.querySelector('#flow').classList.add('active');
     document.querySelector('#incompatible').classList.remove('active');
-    return true;
   } else {
     document.querySelector('#flow').classList.remove('active');
     document.querySelector('#incompatible').classList.add('active');
-    return false;
   }
-}
+});
 
 function showSupportedDevices() {
   document.querySelector('#supported').innerText = ticalc.models().join(', ');
