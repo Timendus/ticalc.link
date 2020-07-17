@@ -9,7 +9,7 @@ window.addEventListener('load', () => {
     attachConnectionListeners();
     updateButtons();
     attachClickListeners();
-    ticalc.init();
+    ticalc.init().catch(e => handleUnsupported(e));
 
     document.querySelector('#flow').classList.add('active');
     document.querySelector('#incompatible').classList.remove('active');
@@ -68,7 +68,8 @@ function attachConnectionListeners() {
 
 function attachClickListeners() {
   document.querySelector('#connect')
-          .addEventListener('click', () => ticalc.choose());
+          .addEventListener('click', () => ticalc.choose(true)
+                                                 .catch(e => handleUnsupported(e)));
 
   document.querySelector('#upload')
           .addEventListener('click', () => selectFile());
@@ -119,4 +120,35 @@ async function sendFile() {
     alert('Sorry, something went wrong 😢');
     console.error(e);
   }
+}
+
+function handleUnsupported(error) {
+  if (
+    error &&
+    error.message == 'Calculator model not supported' &&
+    confirm('Sorry, it looks like your calculator is not yet supported. Would you like to submit it for consideration?') )
+      sendSupportRequest(error.device);
+}
+
+function sendSupportRequest(device) {
+  document.querySelector('#flow').innerHTML = `
+    <h1>Device info to submit</h1>
+    <p>Please <a href='https://github.com/Timendus/ticalc-usb/issues/new?assignees=&labels=device+support+request&template=calculator-support-request.md&title=Calculator+support+request' target="_blank">file a support request on Github</a> with the following information:</p>
+    <pre>${JSON.stringify({
+      deviceClass: device.deviceClass,
+      deviceProtocol: device.deviceProtocol,
+      deviceSubclass: device.deviceSubclass,
+      deviceVersionMajor: device.deviceVersionMajor,
+      deviceVersionMinor: device.deviceVersionMinor,
+      deviceVersionSubminor: device.deviceVersionSubminor,
+      manufacturerName: device.manufacturerName,
+      productId: device.productId,
+      productName: device.productName,
+      serialNumber: device.serialNumber,
+      usbVersionMajor: device.usbVersionMajor,
+      usbVersionMinor: device.usbVersionMinor,
+      usbVersionSubminor: device.usbVersionSubminor,
+      vendorId: device.vendorId
+    }, null, 2)}</pre>
+  `;
 }
