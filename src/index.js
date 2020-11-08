@@ -91,7 +91,7 @@ function attachClickListeners() {
 function selectFile() {
   const input = document.createElement('input');
   input.type  = 'file';
-  input.accept = '.8xp,.8xg,.83p,.83g';
+  input.accept = '.8xp,.8xg,.83p,.83g,.82p,.82g';
   input.addEventListener('change', async c => {
     file = tifiles.parseFile(await readFile(c.target.files[0]));
     console.log(file);
