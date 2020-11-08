@@ -9,7 +9,8 @@ window.addEventListener('load', () => {
     attachConnectionListeners();
     updateButtons();
     attachClickListeners();
-    ticalc.init().catch(e => handleUnsupported(e));
+    ticalc.init({ supportLevel: 'none' })
+    .catch(e => handleUnsupported(e));
 
     document.querySelector('#flow').classList.add('active');
     document.querySelector('#incompatible').classList.remove('active');
@@ -20,7 +21,11 @@ window.addEventListener('load', () => {
 });
 
 function showSupportedDevices() {
-  document.querySelector('#supported').innerText = ticalc.models().join(', ');
+  const calcNames = ticalc.models()
+                          .filter(c => c.status == 'supported' || c.status == 'beta')
+                          .map(c => c.status == 'beta' ? c.name + ' (beta)' : c.name)
+                          .join(', ');
+  document.querySelector('#supported').innerText = calcNames;
 }
 
 function updateButtons() {
@@ -59,6 +64,9 @@ function attachConnectionListeners() {
   });
 
   ticalc.addEventListener('connect', async calc => {
+    if ( ( calc.status == 'experimental' || calc.status == 'beta' ) &&
+         !confirm(`It looks like your device (${calc.name}) only has ${calc.status} support. Are you sure you want to continue?`) )
+      return;
     if ( await calc.isReady() ) {
       calculator = calc;
       updateButtons();
@@ -68,8 +76,10 @@ function attachConnectionListeners() {
 
 function attachClickListeners() {
   document.querySelector('#connect')
-          .addEventListener('click', () => ticalc.choose(true)
-                                                 .catch(e => handleUnsupported(e)));
+          .addEventListener('click', () =>
+            ticalc.choose()
+            .catch(e => handleUnsupported(e))
+          );
 
   document.querySelector('#upload')
           .addEventListener('click', () => selectFile());
@@ -123,11 +133,12 @@ async function sendFile() {
 }
 
 function handleUnsupported(error) {
-  if (
-    error &&
-    error.message == 'Calculator model not supported' &&
-    confirm('Sorry, it looks like your calculator is not yet supported. Would you like to submit it for consideration?') )
+  if ( error && error.message == 'Calculator model not supported' ) {
+    if ( confirm('Sorry, it looks like your device is not yet supported. Would you like to submit it for consideration?') )
       sendSupportRequest(error.device);
+  } else {
+    console.error(error);
+  }
 }
 
 function sendSupportRequest(device) {
