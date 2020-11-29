@@ -4,28 +4,28 @@ let calculator = null;
 let file = null;
 
 window.addEventListener('load', () => {
-  if ( usbSupported() ) {
+  if ( ticalc.browserSupported() ) {
     showSupportedDevices();
     attachConnectionListeners();
     updateButtons();
     attachClickListeners();
-  }
-});
+    ticalc.init({ supportLevel: 'none' })
+    .catch(e => handleUnsupported(e));
 
-function usbSupported() {
-  if ( navigator.usb ) {
     document.querySelector('#flow').classList.add('active');
     document.querySelector('#incompatible').classList.remove('active');
-    return true;
   } else {
     document.querySelector('#flow').classList.remove('active');
     document.querySelector('#incompatible').classList.add('active');
-    return false;
   }
-}
+});
 
 function showSupportedDevices() {
-  document.querySelector('#supported').innerText = ticalc.models().join(', ');
+  const calcNames = ticalc.models()
+                          .filter(c => c.status == 'supported' || c.status == 'beta')
+                          .map(c => c.status == 'beta' ? c.name + ' (beta)' : c.name)
+                          .join(', ');
+  document.querySelector('#supported').innerText = calcNames;
 }
 
 function updateButtons() {
@@ -64,6 +64,9 @@ function attachConnectionListeners() {
   });
 
   ticalc.addEventListener('connect', async calc => {
+    if ( ( calc.status == 'experimental' || calc.status == 'beta' ) &&
+         !confirm(`It looks like your device (${calc.name}) only has ${calc.status} support. Are you sure you want to continue?`) )
+      return;
     if ( await calc.isReady() ) {
       calculator = calc;
       updateButtons();
@@ -73,7 +76,10 @@ function attachConnectionListeners() {
 
 function attachClickListeners() {
   document.querySelector('#connect')
-          .addEventListener('click', () => ticalc.choose());
+          .addEventListener('click', () =>
+            ticalc.choose()
+            .catch(e => handleUnsupported(e))
+          );
 
   document.querySelector('#upload')
           .addEventListener('click', () => selectFile());
@@ -85,7 +91,7 @@ function attachClickListeners() {
 function selectFile() {
   const input = document.createElement('input');
   input.type  = 'file';
-  input.accept = '.8xp,.8xg';
+  input.accept = '.8xp,.8xg,.83p,.83g,.82p,.82g';
   input.addEventListener('change', async c => {
     file = tifiles.parseFile(await readFile(c.target.files[0]));
     console.log(file);
@@ -110,7 +116,7 @@ function readFile(file) {
 
 async function sendFile() {
   if ( !calculator || !file ) return;
-  if ( !tifiles.isMatch(file, calculator) )
+  if ( !calculator.canReceive(file) )
     return alert(`The file you have selected does not appear to be a valid file for your ${calculator.name}`);
   if ( (await calculator.getFreeMem()).ram < file.size )
     return alert('Your calculator does not have enough free memory to receive this file');
@@ -124,4 +130,36 @@ async function sendFile() {
     alert('Sorry, something went wrong 😢');
     console.error(e);
   }
+}
+
+function handleUnsupported(error) {
+  if ( error && error.message == 'Calculator model not supported' ) {
+    if ( confirm('Sorry, it looks like your device is not yet supported. Would you like to submit it for consideration?') )
+      sendSupportRequest(error.device);
+  } else {
+    console.error(error);
+  }
+}
+
+function sendSupportRequest(device) {
+  document.querySelector('#flow').innerHTML = `
+    <h1>Device info to submit</h1>
+    <p>Please <a href='https://github.com/Timendus/ticalc-usb/issues/new?assignees=&labels=device+support+request&template=calculator-support-request.md&title=Calculator+support+request' target="_blank">file a support request on Github</a> with the following information:</p>
+    <pre>${JSON.stringify({
+      deviceClass: device.deviceClass,
+      deviceProtocol: device.deviceProtocol,
+      deviceSubclass: device.deviceSubclass,
+      deviceVersionMajor: device.deviceVersionMajor,
+      deviceVersionMinor: device.deviceVersionMinor,
+      deviceVersionSubminor: device.deviceVersionSubminor,
+      manufacturerName: device.manufacturerName,
+      productId: device.productId,
+      productName: device.productName,
+      serialNumber: device.serialNumber,
+      usbVersionMajor: device.usbVersionMajor,
+      usbVersionMinor: device.usbVersionMinor,
+      usbVersionSubminor: device.usbVersionSubminor,
+      vendorId: device.vendorId
+    }, null, 2)}</pre>
+  `;
 }
