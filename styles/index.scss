@@ -1,10 +1,20 @@
-$background-color: #052b5a;
-$text-color: #d4d4d4;
-$button-color: #1b1a31;
-$active-button-color: #a7610c;
-$complete-button-color: #236946;
+@import 'animation';
+
+$background-color: #F5F5F5;
+$text-color: #444444;
 $shadow: 0px 0px 33px -10px rgba(0,0,0,0.75);
 $font: Roboto, Tahoma, Arial, sans-serif;
+
+$button-color: #cdcdce;
+$button-text: #888888;
+$active-button-color: #3237d4;
+$active-button-text: #EEEEEE;
+$complete-button-color: #36a252;
+$complete-button-text: #EEEEEE;
+$negative-color: #e45252;
+
+$check-width: 28px;
+$check-height: 15px;
 
 html, body, * {
   margin: 0;
@@ -17,7 +27,7 @@ body {
   position: relative;
 }
 
-h1, p, a {
+h1, h2, p, a {
   text-align: center;
   color: $text-color;
   font-family: $font;
@@ -27,6 +37,11 @@ h1 {
   font-size: 3em;
   margin: 0 0 0.2em 0;
   font-variant: small-caps;
+}
+
+h2 {
+  font-size: 1.8em;
+  margin: 0 0 1em 0;
 }
 
 pre {
@@ -43,13 +58,8 @@ main {
 
   & > section {
     display: none;
-    background-color: rgba(255, 255, 255, 0.2);
     width: 100vw;
-    padding: 4em;
-
-    -webkit-box-shadow: $shadow;
-    -moz-box-shadow: $shadow;
-    box-shadow: $shadow;
+    padding: 2em;
 
     &.active {
       display: block;
@@ -75,16 +85,93 @@ footer {
   font-size: 0.8em;
   text-align: left;
 
-  &, a {
-    color: $text-color;
+  p, a {
+    color: lighten($text-color, 30%);
   }
 }
 
-section.buttons {
+#popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background-color 0.2s ease;
+
+  &.active {
+    background-color: rgba(0,0,0,0.4);
+    pointer-events: all;
+
+    #content {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  #content {
+    max-width: 450px;
+    padding: 2em;
+
+    border-radius: 10px;
+    background-color: $background-color;
+    -webkit-box-shadow: $shadow;
+    -moz-box-shadow: $shadow;
+    box-shadow: $shadow;
+
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    transform: scale(0.7);
+    opacity: 0;
+
+    .buttons {
+      text-align: center;
+      margin: 1em auto 0 auto;
+
+      button {
+        margin: 1em;
+        padding: 1em 1.5em;
+        color: #EEEEEE;
+        border-radius: 5px;
+        border: 0;
+        cursor: pointer;
+        font-family: $font;
+        font-size: 0.9em;
+
+        &.yes {
+          background-color: $complete-button-color;
+
+          &:focus {
+            background-color: darken($complete-button-color, 3%);
+          }
+          &:hover {
+            background-color: lighten($complete-button-color, 3%);
+          }
+        }
+        &.no {
+          background-color: $negative-color;
+
+          &:focus {
+            background-color: darken($negative-color, 3%);
+          }
+          &:hover {
+            background-color: lighten($negative-color, 3%);
+          }
+        }
+      }
+    }
+  }
+}
+
+main section.buttons {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin: 2em;
 
   button {
     width: 20vw;
@@ -100,29 +187,80 @@ section.buttons {
     border: 0px;
     cursor: default;
 
-    -webkit-box-shadow: $shadow;
-    -moz-box-shadow: $shadow;
-    box-shadow: $shadow;
-
-    color: $text-color;
+    color: $button-text;
     font-family: $font;
+
+    transition: background-color 0.2s ease, border 0.2s ease;
 
     &.active {
       background-color: $active-button-color;
       cursor: pointer;
+      color: $active-button-text;
 
-      &:focus, &:hover {
-        border: 10px solid darken($active-button-color, 5%);
+      &:focus {
+        background-color: darken($active-button-color, 3%);
+      }
+      &:hover {
+        background-color: lighten($active-button-color, 3%);
       }
     }
 
     &.complete {
       background-color: $complete-button-color;
       cursor: pointer;
+      color: $complete-button-text;
 
-      &:focus, &:hover {
-        border: 10px solid darken($complete-button-color, 5%);
+      &:focus {
+        background-color: darken($complete-button-color, 2%);
       }
+      &:hover {
+        background-color: lighten($complete-button-color, 2%);
+      }
+
+      // Show checkmark animation
+      span {
+        color: $complete-button-color;
+        font-size: 0;
+        width: 38px;
+        height: 57px;
+        padding-top: 6px;
+        margin: 0px auto;
+
+        &:before {
+          content: ' ';
+          left: 50px;
+          display: block;
+          box-sizing: content-box;
+          width: $check-width;
+          height: $check-height;
+
+          border: 5px solid white;
+          border-top: 0;
+          border-right: 0;
+          transform: translate(0px, 18px) rotate(-45deg);
+          transform-origin: left top;
+          @include animation(checkmark-animation 0.6s 1 ease);
+        }
+
+        @include keyframes(checkmark-animation) {
+          0% {
+            height: 0;
+            width: 0;
+            opacity: 1;
+          }
+          50% {
+            height: $check-height;
+            width: 0;
+            opacity: 1;
+          }
+          100% {
+            height: $check-height;
+            width: $check-width;
+            opacity: 1;
+          }
+        }
+      }
+
     }
 
     &:focus {
@@ -138,7 +276,7 @@ section.buttons {
 
   @media screen and (max-width: 600px) {
     flex-direction: column;
-    margin: 2vh;
+    margin: 4vh;
 
     button {
       margin: 2vh 2vw 2vh 2vw;
