@@ -1,10 +1,19 @@
-$background-color: #052b5a;
-$text-color: #d4d4d4;
-$button-color: #1b1a31;
-$active-button-color: #a7610c;
-$complete-button-color: #236946;
+@import 'animation';
+
+$background-color: #F5F5F5;
+$text-color: #444444;
 $shadow: 0px 0px 33px -10px rgba(0,0,0,0.75);
 $font: Roboto, Tahoma, Arial, sans-serif;
+
+$button-color: #cdcdce;
+$button-text: #888888;
+$active-button-color: #3237d4;
+$active-button-text: #EEEEEE;
+$complete-button-color: #36a252;
+$complete-button-text: #EEEEEE;
+
+$check-width: 34px;
+$check-height: 20px;
 
 html, body, * {
   margin: 0;
@@ -43,13 +52,8 @@ main {
 
   & > section {
     display: none;
-    background-color: rgba(255, 255, 255, 0.2);
     width: 100vw;
-    padding: 4em;
-
-    -webkit-box-shadow: $shadow;
-    -moz-box-shadow: $shadow;
-    box-shadow: $shadow;
+    padding: 2em;
 
     &.active {
       display: block;
@@ -75,8 +79,8 @@ footer {
   font-size: 0.8em;
   text-align: left;
 
-  &, a {
-    color: $text-color;
+  p, a {
+    color: lighten($text-color, 30%);
   }
 }
 
@@ -85,6 +89,7 @@ section.buttons {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin: 2em;
 
   button {
     width: 20vw;
@@ -100,29 +105,79 @@ section.buttons {
     border: 0px;
     cursor: default;
 
-    -webkit-box-shadow: $shadow;
-    -moz-box-shadow: $shadow;
-    box-shadow: $shadow;
-
-    color: $text-color;
+    color: $button-text;
     font-family: $font;
+
+    transition: background-color 0.2s ease, border 0.2s ease;
 
     &.active {
       background-color: $active-button-color;
       cursor: pointer;
+      color: $active-button-text;
 
-      &:focus, &:hover {
-        border: 10px solid darken($active-button-color, 5%);
+      &:focus {
+        background-color: darken($active-button-color, 3%);
+      }
+      &:hover {
+        background-color: lighten($active-button-color, 3%);
       }
     }
 
     &.complete {
       background-color: $complete-button-color;
       cursor: pointer;
+      color: $complete-button-text;
 
-      &:focus, &:hover {
-        border: 10px solid darken($complete-button-color, 5%);
+      &:focus {
+        background-color: darken($complete-button-color, 2%);
       }
+      &:hover {
+        background-color: lighten($complete-button-color, 2%);
+      }
+
+      // Show checkmark animation
+      span {
+        color: $complete-button-color;
+        font-size: 0;
+        width: 48px;
+        height: 57px;
+        margin: 0px auto;
+
+        &:before {
+          content: ' ';
+          left: 50px;
+          display: block;
+          box-sizing: content-box;
+          width: $check-width;
+          height: $check-height;
+
+          border: 6px solid white;
+          border-top: 0;
+          border-right: 0;
+          transform: translate(0px, 18px) rotate(-45deg);
+          transform-origin: left top;
+          @include animation(checkmark-animation 0.6s 1 ease);
+        }
+
+        @include keyframes(checkmark-animation) {
+          0% {
+            height: 0;
+            width: 0;
+            opacity: 1;
+          }
+          50% {
+            height: $check-height;
+            width: 0;
+            opacity: 1;
+          }
+          100% {
+            height: $check-height;
+            width: $check-width;
+            opacity: 1;
+          }
+        }
+      }
+
     }
 
     &:focus {
@@ -138,7 +193,7 @@ section.buttons {
 
   @media screen and (max-width: 600px) {
     flex-direction: column;
-    margin: 2vh;
+    margin: 4vh;
 
     button {
       margin: 2vh 2vw 2vh 2vw;
