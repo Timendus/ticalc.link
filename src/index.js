@@ -64,14 +64,23 @@ function attachConnectionListeners() {
   });
 
   ticalc.addEventListener('connect', async calc => {
-    if ( ( calc.status == 'experimental' || calc.status == 'beta' ) &&
-         !confirm(`It looks like your device (${calc.name}) only has ${calc.status} support. Are you sure you want to continue?`) )
-      return;
-    if ( await calc.isReady() ) {
-      calculator = calc;
-      updateButtons();
+    if ( calc.status == 'experimental' || calc.status == 'beta' ) {
+      return confirm('Be careful!', `Your device (${calc.name}) only has ${calc.status} support. Are you sure you want to continue?`)
+             .then(() => connect(calc))
+             .catch(() => {});
+    } else {
+      return connect(calc);
     }
   });
+}
+
+async function connect(calc) {
+  if ( await calc.isReady() ) {
+    calculator = calc;
+    updateButtons();
+  } else {
+    alert('Sorry!', 'The connected device does not seem to be responding.');
+  }
 }
 
 function attachClickListeners() {
@@ -98,7 +107,7 @@ function selectFile() {
 
     if ( !tifiles.isValid(file) ) {
       file = null;
-      alert('The file you have selected does not seem to be a valid calculator file');
+      alert('Sorry!', 'The file you have selected does not seem to be a valid calculator file');
     }
 
     updateButtons();
@@ -117,25 +126,26 @@ function readFile(file) {
 async function sendFile() {
   if ( !calculator || !file ) return;
   if ( !calculator.canReceive(file) )
-    return alert(`The file you have selected does not appear to be a valid file for your ${calculator.name}`);
+    return alert('Sorry!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
   if ( (await calculator.getFreeMem()).ram < file.size )
-    return alert('Your calculator does not have enough free memory to receive this file');
+    return alert('Sorry!', 'Your calculator does not have enough free memory to receive this file.');
 
   try {
     await calculator.sendFile(file);
     document.querySelector('#start').classList.remove('active');
     document.querySelector('#start').classList.add('complete');
-    setTimeout(() => alert('The file has been sent!'), 100);
+    alert('Success!', 'The file has been sent!');
   } catch(e) {
-    alert('Sorry, something went wrong 😢');
+    alert('Sorry!', 'Something went wrong 😢');
     console.error(e);
   }
 }
 
 function handleUnsupported(error) {
   if ( error && error.message == 'Calculator model not supported' ) {
-    if ( confirm('Sorry, it looks like your device is not yet supported. Would you like to submit it for consideration?') )
-      sendSupportRequest(error.device);
+    confirm('Sorry!', 'It looks like your device is not yet supported. Would you like to submit it for consideration?')
+    .then(() => sendSupportRequest(error.device))
+    .catch(() => {});
   } else {
     console.error(error);
   }
@@ -162,4 +172,49 @@ function sendSupportRequest(device) {
       vendorId: device.vendorId
     }, null, 2)}</pre>
   `;
+}
+
+function setPopup(title, body) {
+  const popup = document.getElementById('popup');
+  popup.querySelector('h2').innerText = title;
+  popup.querySelector('p').innerText = body;
+  popup.querySelector('.buttons').innerHTML = '';
+  return popup;
+}
+
+function popupButton(clss, text, fn) {
+  const button = document.createElement('button');
+  button.classList.add(clss);
+  button.innerText = text;
+  button.onclick = fn;
+  return button;
+}
+
+function alert(title, body) {
+  return new Promise((resolve, reject) => {
+    const popup = setPopup(title, body);
+    const button = popupButton('yes', 'Okay', () => {
+      popup.classList.remove('active');
+      resolve();
+    });
+    popup.querySelector('.buttons').appendChild(button);
+    popup.classList.add('active');
+  });
+}
+
+function confirm(title, body) {
+  return new Promise((resolve, reject) => {
+    const popup = setPopup(title, body);
+    const yesButton = popupButton('yes', 'Okay', () => {
+      popup.classList.remove('active');
+      resolve();
+    });
+    const noButton = popupButton('no', 'Cancel', () => {
+      popup.classList.remove('active');
+      reject();
+    });
+    popup.querySelector('.buttons').appendChild(yesButton);
+    popup.querySelector('.buttons').appendChild(noButton);
+    popup.classList.add('active');
+  });
 }
