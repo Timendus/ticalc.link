@@ -127,7 +127,7 @@ async function sendFile() {
   if ( !calculator || !file ) return;
   if ( !calculator.canReceive(file) )
     return alert('Sorry!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
-  if ( (await calculator.getFreeMem()).ram < file.size )
+  if ( !(await calculator.getStorageDetails()).fits )
     return alert('Sorry!', 'Your calculator does not have enough free memory to receive this file.');
 
   try {
