@@ -109,6 +109,9 @@ function selectFile() {
       file = null;
       alert('Sorry!', 'The file you have selected does not seem to be a valid calculator file');
     }
+    if ( calculator && !calculator.canReceive(file) ) {
+      return alert('Careful!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
+    }
 
     updateButtons();
   });
@@ -127,7 +130,8 @@ async function sendFile() {
   if ( !calculator || !file ) return;
   if ( !calculator.canReceive(file) )
     return alert('Sorry!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
-  if ( (await calculator.getFreeMem()).ram < file.size )
+  const details = await calculator.getStorageDetails(file);
+  if ( !details.fits )
     return alert('Sorry!', 'Your calculator does not have enough free memory to receive this file.');
 
   try {
