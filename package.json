@@ -2,16 +2,16 @@
   "name": "ticalc.link",
   "description": "Send files to your calculator from the browser",
   "scripts": {
-    "start": "webpack-dev-server --watch",
+    "start": "webpack-dev-server",
     "watch-styles": "node-sass --output-style='compressed' --watch ./styles/index.scss ./docs/style.css",
     "build": "webpack --mode production && node-sass --output-style='compressed' ./styles/index.scss ./docs/style.css"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "node-sass": "^4.14.1",
-    "ticalc-usb": "^1.1.1",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "node-sass": "^6.0.1",
+    "ticalc-usb": "^1.1.2",
+    "webpack": "^5.52.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.2.1"
   }
 }
