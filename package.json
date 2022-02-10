@@ -8,7 +8,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "ticalc-usb": "^1.1.2",
     "webpack": "^5.52.1",
     "webpack-cli": "^4.8.0",
