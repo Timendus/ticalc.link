@@ -104,15 +104,6 @@ function selectFile() {
   input.addEventListener('change', async c => {
     file = tifiles.parseFile(await readFile(c.target.files[0]));
     console.log(file);
-
-    if ( !tifiles.isValid(file) ) {
-      file = null;
-      alert('Sorry!', 'The file you have selected does not seem to be a valid calculator file');
-    }
-    if ( calculator && !calculator.canReceive(file) ) {
-      return alert('Careful!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
-    }
-
     updateButtons();
   });
   input.click();
