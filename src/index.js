@@ -1,7 +1,7 @@
 const { ticalc, tifiles } = require('ticalc-usb');
 
 let calculator = null;
-let file = null;
+let files = null;
 
 window.addEventListener('load', () => {
   if ( ticalc.browserSupported() ) {
@@ -40,14 +40,14 @@ function updateButtons() {
     document.querySelector('#connect').focus();
   }
 
-  if ( file )
+  if ( files )
     document.querySelector('#upload').classList.add('complete');
   else if ( calculator ) {
     document.querySelector('#upload').classList.add('active');
     document.querySelector('#upload').focus();
   }
 
-  if ( calculator && file ) {
+  if ( calculator && files ) {
     document.querySelector('#start').classList.add('active');
     document.querySelector('#start').focus();
   }
@@ -91,26 +91,31 @@ function attachClickListeners() {
           );
 
   document.querySelector('#upload')
-          .addEventListener('click', () => selectFile());
+          .addEventListener('click', () => selectFiles());
 
   document.querySelector('#start')
-          .addEventListener('click', () => sendFile());
+          .addEventListener('click', () => sendFiles());
 }
 
-function selectFile() {
+function selectFiles() {
   const input = document.createElement('input');
   input.type  = 'file';
   input.accept = '.8xp,.8xg,.8xv,.83p,.83g,.82p,.82g';
+  input.multiple = 'multiple';
   input.addEventListener('change', async c => {
-    file = tifiles.parseFile(await readFile(c.target.files[0]));
-    console.log(file);
+    files = [];
+    for (i in c.target.files) {
+        files.push(tifiles.parseFile(await readFile(c.target.files[i])));
+      
+        console.log(files[i]);
 
-    if ( !tifiles.isValid(file) ) {
-      file = null;
-      alert('Sorry!', 'The file you have selected does not seem to be a valid calculator file');
-    }
-    if ( calculator && !calculator.canReceive(file) ) {
-      return alert('Careful!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
+        if ( !tifiles.isValid(files[i]) ) {
+          files = null;
+          alert('Sorry!', 'The file you have selected does not seem to be a valid calculator file');
+        }
+        if ( calculator && !calculator.canReceive(files[i]) ) {
+          return alert('Careful!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
+        }
     }
 
     updateButtons();
@@ -126,22 +131,24 @@ function readFile(file) {
   });
 }
 
-async function sendFile() {
-  if ( !calculator || !file ) return;
-  if ( !calculator.canReceive(file) )
-    return alert('Sorry!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
-  const details = await calculator.getStorageDetails(file);
-  if ( !details.fits )
-    return alert('Sorry!', 'Your calculator does not have enough free memory to receive this file.');
+async function sendFiles() {
+  if ( !calculator || !files ) return;
+  for (i in files) {
+    if ( !calculator.canReceive(files[i]) )
+      return alert('Sorry!', `The file you have selected does not appear to be a valid file for your ${calculator.name}.`);
+    const details = await calculator.getStorageDetails(files[i]);
+    if ( !details.fits )
+      return alert('Sorry!', 'Your calculator does not have enough free memory to receive this file.');
 
-  try {
-    await calculator.sendFile(file);
-    document.querySelector('#start').classList.remove('active');
-    document.querySelector('#start').classList.add('complete');
-    alert('Success!', 'The file has been sent!');
-  } catch(e) {
-    alert('Sorry!', 'Something went wrong 😢');
-    console.error(e);
+    try {
+      await calculator.sendFiles(files[i]);
+      document.querySelector('#start').classList.remove('active');
+      document.querySelector('#start').classList.add('complete');
+      alert('Success!', 'The file have been sent!');
+    } catch(e) {
+      alert('Sorry!', 'Something went wrong 😢');
+      console.error(e);
+    }
   }
 }
 
