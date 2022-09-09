@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T0DOOWP)
+
 # ticalc.link
 
 This is a website that allows the user to upload files to their calculators
